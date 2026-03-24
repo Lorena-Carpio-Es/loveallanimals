@@ -1,0 +1,6 @@
+@Love4AnimalsAPI_HostAddress = http://localhost:5116
+
+GET {{Love4AnimalsAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
