@@ -1,4 +1,5 @@
 namespace Love4AnimalsAPI.Dto;
+using Love4AnimalsAPI.Models;
 
 public class UpdateCampaignDto
 {
@@ -8,7 +9,7 @@ public class UpdateCampaignDto
 
     public double CurrentAmount { get; set; }
 
-    public string Status { get; set; }
+     public CampaignStatus Status { get; set; }
 
     public string Description { get; set; }
 }

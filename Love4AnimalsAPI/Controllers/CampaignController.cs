@@ -53,6 +53,7 @@ public class CampaignController : ControllerBase
             Title = dto.Title,
             GoalAmount = dto.GoalAmount,
             CurrentAmount = dto.CurrentAmount,
+            Status = dto.Status,
             Description = dto.Description
         };
 
