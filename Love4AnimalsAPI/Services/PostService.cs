@@ -21,7 +21,7 @@ public class PostService : IPostService
     {
         pub.Id = idCounter++;
         pub.CreationDate = DateTime.Now;
-        pub.State = "0";
+        pub.State = "Active";
         publications.Add(pub);
         return pub;
     }

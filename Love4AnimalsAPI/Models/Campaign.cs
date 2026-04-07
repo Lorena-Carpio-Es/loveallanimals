@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Love4AnimalsAPI.Models;
 
 public enum CampaignStatus
@@ -9,7 +11,7 @@ public enum CampaignStatus
 
 public class Campaign
 {
-    public int Id { get; set; }
+    public long Id { get; set; }
 
     public string Title { get; set; }
 
@@ -20,4 +22,6 @@ public class Campaign
     public CampaignStatus Status { get; set; }
 
     public string Description { get; set; }
+
+    
 }

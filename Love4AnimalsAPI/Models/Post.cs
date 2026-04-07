@@ -20,4 +20,6 @@ public class Post
         public long UserId { get; set; }
         public long CampaignId { get; set; }
 
+        
+
 }
