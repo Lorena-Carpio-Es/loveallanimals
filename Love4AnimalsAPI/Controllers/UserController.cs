@@ -42,7 +42,8 @@ public class UserController : ControllerBase
             Name = dto.Name
         };
 
-        return Ok(_service.Create(user));
+        var created = _service.Create(user);
+        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
     // PUT
@@ -70,6 +71,6 @@ public class UserController : ControllerBase
 
         if (!deleted) return NotFound();
 
-        return Ok("Usuario eliminado");
+        return NoContent();
     }
 }

@@ -19,31 +19,32 @@ public class CommentController : ControllerBase
         _postService = postService;
     }
 
-    // 🔵 GET comentarios de un post
+    // GET comentarios de un post
     [HttpGet]
     public IActionResult GetByPost(long postId)
     {
         return Ok(_service.GetByPost(postId));
     }
 
-    // 🟢 POST crear comentario
+    // POST crear comentario
     [HttpPost]
     public IActionResult Create(long postId, [FromBody] CreateCommentDto dto)
     {
         var post = _postService.GetById(postId);
 
         if (post == null)
-            return BadRequest("El post no existe ❌");
+            return NotFound();
 
         var comment = new Comment
         {
             Text = dto.Text
         };
 
-        return Ok(_service.Create(postId, comment));
+        var created = _service.Create(postId, comment);
+        return CreatedAtAction(nameof(GetByPost), new { postId = postId }, created);
     }
 
-    // 🟡 PUT actualizar comentario
+    // PUT actualizar comentario
     [HttpPut("{id}")]
     public IActionResult Update(long id, [FromBody] UpdateCommentDto dto)
     {
@@ -58,12 +59,12 @@ public class CommentController : ControllerBase
         return Ok(updated);
     }
 
-    // 🔴 DELETE comentario
+    // DELETE comentario
     [HttpDelete("{id}")]
     public IActionResult Delete(long id)
     {
         if (!_service.Delete(id)) return NotFound();
 
-        return Ok("Comentario eliminado");
+        return NoContent();
     }
 }

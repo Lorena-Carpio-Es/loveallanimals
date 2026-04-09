@@ -1,42 +1,24 @@
 using System;
 using Love4AnimalsAPI.Interfaces;
 using Love4AnimalsAPI.Models;
+using Love4AnimalsAPI.Repositories;
+
 namespace Love4AnimalsAPI.Services;
 
 public class CommentService : ICommentService
 {
-    private static List<Comment> comments = new();
-    private static long idCounter = 1;
+    private readonly CommentRepository _repo;
 
-    public List<Comment> GetByPost(long postId)
-        => comments.Where(c => c.PostId == postId).ToList();
-
-    public Comment Create(long postId, Comment comment)
+    public CommentService(CommentRepository repo)
     {
-        comment.Id = idCounter++;
-        comment.Date = DateTime.Now;
-        comment.PostId = postId;
-
-        comments.Add(comment);
-        return comment;
+        _repo = repo;
     }
 
-    public Comment Update(long id, Comment comment)
-    {
-        var existing = comments.FirstOrDefault(c => c.Id == id);
-        if (existing == null) return null;
+    public List<Comment> GetByPost(long postId) => _repo.GetByPost(postId);
 
-        existing.Text = comment.Text;
-        return existing;
-    }
+    public Comment Create(long postId, Comment comment) => _repo.Create(postId, comment);
 
-    public bool Delete(long id)
-    {
-        var comment = comments.FirstOrDefault(c => c.Id == id);
-        if (comment == null) return false;
+    public Comment Update(long id, Comment comment) => _repo.Update(id, comment);
 
-        comments.Remove(comment);
-        return true;
-    }
-
+    public bool Delete(long id) => _repo.Delete(id);
 }

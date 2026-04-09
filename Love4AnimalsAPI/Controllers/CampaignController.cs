@@ -42,7 +42,10 @@ public class CampaignController : ControllerBase
             Description = dto.Description
         };
 
-        return Ok(_service.Create(campaign));
+        var created = _service.Create(campaign);
+
+        // Devuelve 201 Created con la ubicaci�n del recurso (CreatedAtAction)
+        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
     [HttpPut("{id}")]
@@ -71,6 +74,7 @@ public class CampaignController : ControllerBase
 
         if (!deleted) return NotFound();
 
-        return Ok("Campaign deleted");
+        // Devuelve 204 No Content cuando la eliminaci�n es correcta
+        return NoContent();
     }
 }

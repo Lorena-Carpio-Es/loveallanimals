@@ -3,7 +3,6 @@ using Love4AnimalsAPI.Interfaces;
 using Love4AnimalsAPI.Models;
 using Love4AnimalsAPI.Dto;
 
-using Microsoft.AspNetCore.Http;
 namespace Love4AnimalsAPI.Controllers;
 
 [ApiController]
@@ -17,12 +16,12 @@ public class PublicacionController : ControllerBase
         _service = service;
     }
 
-    // 🔵 GET todas
+    // GET todas
     [HttpGet]
     public IActionResult GetAll()
         => Ok(_service.GetAll());
 
-    // 🔵 GET por ID
+    // GET por ID
     [HttpGet("{id}")]
     public IActionResult GetById(long id)
     {
@@ -31,32 +30,30 @@ public class PublicacionController : ControllerBase
         return Ok(pub);
     }
 
-    // 🔵 GET por usuario
+    // GET por usuario
     [HttpGet("user/{id}")]
     public IActionResult GetByUser(long id)
         => Ok(_service.GetByUser(id));
 
-    // 🟢 POST crear
+    // POST crear
     [HttpPost]
-public IActionResult Create(CreatePostDto dto)
-{
-    var pub = new Post
+    public IActionResult Create(CreatePostDto dto)
     {
-        Title = dto.Title,
-        FundraisingGoal = dto.FundraisingGoal,
-        Description = dto.Description,
+        var pub = new Post
+        {
+            Title = dto.Title,
+            FundraisingGoal = dto.FundraisingGoal,
+            Description = dto.Description,
+            Image = dto.Image,
+            UserId = dto.UserId,
+            CampaignId = dto.CampaignId
+        };
 
-        // se guarda exactamente lo que escribes
-        Image = dto.Image,
+        var created = _service.Create(pub);
+        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+    }
 
-        UserId = dto.UserId,
-        CampaignId = dto.CampaignId
-    };
-
-    return Ok(_service.Create(pub));
-}
-
-    // 🟡 PUT actualizar
+    // PUT actualizar
     [HttpPut("{id}")]
     public IActionResult Update(long id, UpdatePostDto dto)
     {
@@ -72,27 +69,27 @@ public IActionResult Create(CreatePostDto dto)
         return Ok(updated);
     }
 
-    // 🔴 DELETE
+    // DELETE
     [HttpDelete("{id}")]
     public IActionResult Delete(long id)
     {
         if (!_service.Delete(id)) return NotFound();
-        return Ok("Eliminado");
+        return NoContent();
     }
 
-    // ❤️ LIKE
+    // LIKE
     [HttpPost("{id}/likes")]
     public IActionResult Like(long id)
     {
         _service.DarLike(id);
-        return Ok("Like agregado");
+        return Ok();
     }
 
-    // 🔄 SHARE
+    // SHARE
     [HttpPost("{id}/shares")]
     public IActionResult Share(long id)
     {
         _service.Compartir(id);
-        return Ok("Compartido");
+        return Ok();
     }
 }
