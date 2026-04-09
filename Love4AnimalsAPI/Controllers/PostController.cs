@@ -3,6 +3,7 @@ using Love4AnimalsAPI.Interfaces;
 using Love4AnimalsAPI.Models;
 using Love4AnimalsAPI.Dto;
 
+using Microsoft.AspNetCore.Http;
 namespace Love4AnimalsAPI.Controllers;
 
 [ApiController]
@@ -37,20 +38,23 @@ public class PublicacionController : ControllerBase
 
     // 🟢 POST crear
     [HttpPost]
-    public IActionResult Create(CreatePostDto dto)
+public IActionResult Create(CreatePostDto dto)
+{
+    var pub = new Post
     {
-        var pub = new Post
-        {
-            Title = dto.Title,
-            FundraisingGoal = dto.FundraisingGoal,
-            Description = dto.Description,
-            Image = dto.Image,
-            UserId = dto.UserId,
-            CampaignId = dto.CampaignId
-        };
+        Title = dto.Title,
+        FundraisingGoal = dto.FundraisingGoal,
+        Description = dto.Description,
 
-        return Ok(_service.Create(pub));
-    }
+        // se guarda exactamente lo que escribes
+        Image = dto.Image,
+
+        UserId = dto.UserId,
+        CampaignId = dto.CampaignId
+    };
+
+    return Ok(_service.Create(pub));
+}
 
     // 🟡 PUT actualizar
     [HttpPut("{id}")]
