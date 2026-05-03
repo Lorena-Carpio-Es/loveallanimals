@@ -33,7 +33,7 @@ public class CampaignRepository
         existing.CurrentAmount = campaign.CurrentAmount;
         existing.Description = campaign.Description;
 
-        // Mantener el enum correctamente
+       
         existing.Status = campaign.Status;
 
         return existing;

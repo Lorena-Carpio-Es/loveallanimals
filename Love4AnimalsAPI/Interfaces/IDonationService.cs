@@ -14,7 +14,7 @@ public interface IDonationService
 
     bool Delete(int id);
     
-    // Métodos adicionales necesarios según los endpoints
+
     List<Donation> GetByCampaignId(int campaignId);
     
     List<Donation> GetByUserId(int userId);

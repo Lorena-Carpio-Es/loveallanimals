@@ -9,6 +9,7 @@
       "Love4AnimalsAPI/1.0.0": {
         "dependencies": {
           "Microsoft.AspNetCore.OpenApi": "10.0.2",
+          "Scalar.AspNetCore": "2.13.21",
           "Swashbuckle.AspNetCore": "10.1.5"
         },
         "runtime": {
@@ -31,6 +32,14 @@
           "lib/net8.0/Microsoft.OpenApi.dll": {
             "assemblyVersion": "2.4.1.0",
             "fileVersion": "2.4.1.0"
+          }
+        }
+      },
+      "Scalar.AspNetCore/2.13.21": {
+        "runtime": {
+          "lib/net10.0/Scalar.AspNetCore.dll": {
+            "assemblyVersion": "2.13.21.0",
+            "fileVersion": "2.13.21.0"
           }
         }
       },
@@ -92,6 +101,13 @@
       "sha512": "sha512-u7QhXCISMQuab3flasb1hoaiERmUqyWsW7tmQODyILoQ7mJV5IRGM+2KKZYo0QUfC13evEOcHAb6TPWgqEQtrw==",
       "path": "microsoft.openapi/2.4.1",
       "hashPath": "microsoft.openapi.2.4.1.nupkg.sha512"
+    },
+    "Scalar.AspNetCore/2.13.21": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-A4ybafv4YQR0K91JNXZW6rxWFRRqZUgeygkcwE5+62HMllS6pnXjUBJ1/JnOQPQMeODjjAh4stqGsWgRn9xD1Q==",
+      "path": "scalar.aspnetcore/2.13.21",
+      "hashPath": "scalar.aspnetcore.2.13.21.nupkg.sha512"
     },
     "Swashbuckle.AspNetCore/10.1.5": {
       "type": "package",
