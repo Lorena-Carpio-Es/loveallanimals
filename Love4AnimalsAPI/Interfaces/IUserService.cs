@@ -5,9 +5,9 @@ namespace Love4AnimalsAPI.Interfaces;
 
 public interface IUserService
 {
-     List<User> GetAll();
-    User GetById(int id);
-    User Create(User user);
-    User Update(int id, User user);
-    bool Delete(int id);
+    Task<List<User>> GetAllAsync();
+    Task<User?> GetByIdAsync(int id);
+    Task<User> CreateAsync(User user);
+    Task<bool> UpdateAsync(int id, User user);
+    Task<bool> DeleteAsync(int id);
 }

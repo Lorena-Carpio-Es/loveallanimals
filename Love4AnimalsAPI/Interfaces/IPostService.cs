@@ -4,15 +4,11 @@ namespace Love4AnimalsAPI.Interfaces;
 
 public interface IPostService
 {
-    List<Post> GetAll();
-    Post GetById(long id);
-    List<Post> GetByUser(long userId);
+    Task<List<Post>> GetAllAsync();
+    Task<Post?> GetByIdAsync(long id);
+    Task<Post> CreateAsync(Post post);
+    Task<bool> DeleteAsync(long id);
 
-    Post Create(Post pub);
-    Post Update(long id, Post pub);
-    bool Delete(long id);
-
-    void DarLike(long id);
-    void Compartir(long id);
-
+    Task LikeAsync(long id);
+    Task ShareAsync(long id);
 }

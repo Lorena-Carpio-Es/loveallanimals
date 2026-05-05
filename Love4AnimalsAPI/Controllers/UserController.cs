@@ -16,61 +16,48 @@ public class UserController : ControllerBase
         _service = service;
     }
 
-    // GET
     [HttpGet]
-    public IActionResult GetAll()
+    public async Task<IActionResult> GetAll()
     {
-        return Ok(_service.GetAll());
+        return Ok(await _service.GetAllAsync());
     }
 
-    // GET by id
     [HttpGet("{id}")]
-    public IActionResult GetById(int id)
+    public async Task<IActionResult> GetById(int id)
     {
-        var user = _service.GetById(id);
-        if (user == null) return NotFound();
-        return Ok(user);
+        var user = await _service.GetByIdAsync(id);
+        return user == null ? NotFound() : Ok(user);
     }
 
-    // POST
     [HttpPost]
-    public IActionResult Create(CreateUserDto dto)
+    public async Task<IActionResult> Create(CreateUserDto dto)
     {
         var user = new User
         {
-            Email = dto.Email,
-            Name = dto.Name
+            Name = dto.Name,
+            Email = dto.Email
         };
 
-        var created = _service.Create(user);
-        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+        return Ok(await _service.CreateAsync(user));
     }
 
-    // PUT
     [HttpPut("{id}")]
-    public IActionResult Update(int id, UpdateUserDto dto)
+    public async Task<IActionResult> Update(int id, UpdateUserDto dto)
     {
         var user = new User
         {
-            Email = dto.Email,
-            Name = dto.Name
+            Name = dto.Name,
+            Email = dto.Email
         };
 
-        var updated = _service.Update(id, user);
-
-        if (updated == null) return NotFound();
-
-        return Ok(updated);
+        var ok = await _service.UpdateAsync(id, user);
+        return ok ? NoContent() : NotFound();
     }
 
-    // DELETE
     [HttpDelete("{id}")]
-    public IActionResult Delete(int id)
+    public async Task<IActionResult> Delete(int id)
     {
-        var deleted = _service.Delete(id);
-
-        if (!deleted) return NotFound();
-
-        return NoContent();
+        var ok = await _service.DeleteAsync(id);
+        return ok ? NoContent() : NotFound();
     }
 }

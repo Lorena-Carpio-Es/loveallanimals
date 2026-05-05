@@ -16,80 +16,50 @@ public class PublicacionController : ControllerBase
         _service = service;
     }
 
-    // GET todas
     [HttpGet]
-    public IActionResult GetAll()
-        => Ok(_service.GetAll());
+    public async Task<IActionResult> GetAll()
+        => Ok(await _service.GetAllAsync());
 
-    // GET por ID
     [HttpGet("{id}")]
-    public IActionResult GetById(long id)
+    public async Task<IActionResult> GetById(long id)
     {
-        var pub = _service.GetById(id);
-        if (pub == null) return NotFound();
-        return Ok(pub);
+        var post = await _service.GetByIdAsync(id);
+        return post == null ? NotFound() : Ok(post);
     }
 
-    // GET por usuario
-    [HttpGet("user/{id}")]
-    public IActionResult GetByUser(long id)
-        => Ok(_service.GetByUser(id));
-
-    // POST crear
     [HttpPost]
-    public IActionResult Create(CreatePostDto dto)
+    public async Task<IActionResult> Create([FromForm] CreatePostDto dto)
     {
-        var pub = new Post
-        {
-            Title = dto.Title,
-            FundraisingGoal = dto.FundraisingGoal,
-            Description = dto.Description,
-            Image = dto.Image,
-            UserId = dto.UserId,
-            CampaignId = dto.CampaignId
-        };
+    string imageUrl = "";
 
-        var created = _service.Create(pub);
-        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+    if (dto.Image != null)
+    {
+        var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images");
+
+        if (!Directory.Exists(folderPath))
+            Directory.CreateDirectory(folderPath);
+
+        var fileName = Guid.NewGuid() + Path.GetExtension(dto.Image.FileName);
+        var filePath = Path.Combine(folderPath, fileName);
+
+        using var stream = new FileStream(filePath, FileMode.Create);
+        await dto.Image.CopyToAsync(stream);
+
+        imageUrl = $"http://localhost:5116/images/{fileName}";
     }
 
-    // PUT actualizar
-    [HttpPut("{id}")]
-    public IActionResult Update(long id, UpdatePostDto dto)
+    var post = new Post
     {
-        var pub = new Post
-        {
-            Title = dto.Title,
-            Description = dto.Description
-        };
+        Title = dto.Title,
+        FundraisingGoal = dto.FundraisingGoal,
+        Description = dto.Description,
+        Image = imageUrl,
+        UserId = dto.UserId,           // 🔥 IMPORTANTE
+        CampaignId = dto.CampaignId    // 🔥 IMPORTANTE
+    };
 
-        var updated = _service.Update(id, pub);
-        if (updated == null) return NotFound();
+    var created = await _service.CreateAsync(post);
 
-        return Ok(updated);
-    }
-
-    // DELETE
-    [HttpDelete("{id}")]
-    public IActionResult Delete(long id)
-    {
-        if (!_service.Delete(id)) return NotFound();
-        return NoContent();
-    }
-
-    // LIKE
-    [HttpPost("{id}/likes")]
-    public IActionResult Like(long id)
-    {
-        _service.DarLike(id);
-        return Ok();
-    }
-
-    // SHARE
-    [HttpPost("{id}/shares")]
-    public IActionResult Share(long id)
-    {
-        _service.Compartir(id);
-        return Ok();
-    }
+    return Ok(created);
+   }
 }

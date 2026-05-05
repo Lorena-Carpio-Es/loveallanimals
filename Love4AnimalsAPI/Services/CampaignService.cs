@@ -1,25 +1,65 @@
+using Microsoft.EntityFrameworkCore;
+using Love4AnimalsAPI.Data;
 using Love4AnimalsAPI.Interfaces;
 using Love4AnimalsAPI.Models;
-using Love4AnimalsAPI.Repositories;
 
 namespace Love4AnimalsAPI.Services;
 
 public class CampaignService : ICampaignService
 {
-    private readonly CampaignRepository _repo;
+    private readonly AppDbContext _context;
 
-    public CampaignService(CampaignRepository repo)
+    public CampaignService(AppDbContext context)
     {
-        _repo = repo;
+        _context = context;
     }
 
-    public List<Campaign> GetAll() => _repo.GetAll();
+    public async Task<List<Campaign>> GetAllAsync()
+    {
+        return await _context.Campaigns
+            .Include(c => c.Posts)
+            .ToListAsync();
+    }
 
-    public Campaign GetById(int id) => _repo.GetById(id);
+    public async Task<Campaign?> GetByIdAsync(int id)
+    {
+        return await _context.Campaigns
+            .Include(c => c.Posts)
+            .FirstOrDefaultAsync(c => c.Id == id);
+    }
 
-    public Campaign Create(Campaign campaign) => _repo.Create(campaign);
+    public async Task<Campaign> CreateAsync(Campaign campaign)
+    {
+        campaign.Status = CampaignStatus.Active;
 
-    public Campaign Update(int id, Campaign campaign) => _repo.Update(id, campaign);
+        _context.Campaigns.Add(campaign);
+        await _context.SaveChangesAsync();
 
-    public bool Delete(int id) => _repo.Delete(id);
+        return campaign;
+    }
+
+    public async Task<bool> UpdateAsync(int id, Campaign campaign)
+    {
+        var existing = await _context.Campaigns.FindAsync(id);
+        if (existing == null) return false;
+
+        existing.Title = campaign.Title;
+        existing.GoalAmount = campaign.GoalAmount;
+        existing.CurrentAmount = campaign.CurrentAmount;
+        existing.Status = campaign.Status;
+        existing.Description = campaign.Description;
+
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> DeleteAsync(int id)
+    {
+        var campaign = await _context.Campaigns.FindAsync(id);
+        if (campaign == null) return false;
+
+        _context.Campaigns.Remove(campaign);
+        await _context.SaveChangesAsync();
+        return true;
+    }
 }

@@ -1,4 +1,6 @@
 using System;
+using Microsoft.EntityFrameworkCore;
+using Love4AnimalsAPI.Data;
 using Love4AnimalsAPI.Interfaces;
 using Love4AnimalsAPI.Models;
 using Love4AnimalsAPI.Repositories;
@@ -7,26 +9,67 @@ namespace Love4AnimalsAPI.Services;
 
 public class PostService : IPostService
 {
-    private readonly PostRepository _repo;
+    private readonly AppDbContext _context;
 
-    public PostService(PostRepository repo)
+    public PostService(AppDbContext context)
     {
-        _repo = repo;
+        _context = context;
     }
 
-    public List<Post> GetAll() => _repo.GetAll();
+    public async Task<List<Post>> GetAllAsync()
+    {
+        return await _context.Posts
+            .Include(p => p.User)
+            .Include(p => p.Campaign)
+            .Include(p => p.Comments)
+            .ToListAsync();
+    }
 
-    public Post GetById(long id) => _repo.GetById(id);
+    public async Task<Post?> GetByIdAsync(long id)
+    {
+        return await _context.Posts
+            .Include(p => p.Comments)
+            .FirstOrDefaultAsync(p => p.Id == id);
+    }
 
-    public List<Post> GetByUser(long userId) => _repo.GetByUser(userId);
+    public async Task<Post> CreateAsync(Post post)
+    {
+        post.CreationDate = DateTime.Now;
+        post.State = "Active";
 
-    public Post Create(Post pub) => _repo.Create(pub);
+        _context.Posts.Add(post);
+        await _context.SaveChangesAsync();
 
-    public Post Update(long id, Post pub) => _repo.Update(id, pub);
+        return post;
+    }
 
-    public bool Delete(long id) => _repo.Delete(id);
+    public async Task<bool> DeleteAsync(long id)
+    {
+        var post = await _context.Posts.FindAsync(id);
+        if (post == null) return false;
 
-    public void DarLike(long id) => _repo.DarLike(id);
+        _context.Posts.Remove(post);
+        await _context.SaveChangesAsync();
+        return true;
+    }
 
-    public void Compartir(long id) => _repo.Compartir(id);
+    public async Task LikeAsync(long id)
+    {
+        var post = await _context.Posts.FindAsync(id);
+        if (post != null)
+        {
+            post.QuantityLikes++;
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    public async Task ShareAsync(long id)
+    {
+        var post = await _context.Posts.FindAsync(id);
+        if (post != null)
+        {
+            post.QuantityShared++;
+            await _context.SaveChangesAsync();
+        }
+    }
 }

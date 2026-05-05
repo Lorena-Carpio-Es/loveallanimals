@@ -19,52 +19,49 @@ public class CommentController : ControllerBase
         _postService = postService;
     }
 
-    // GET comentarios de un post
+    // 🔵 GET comentarios por post
     [HttpGet]
-    public IActionResult GetByPost(long postId)
+    public async Task<IActionResult> GetByPost(long postId)
     {
-        return Ok(_service.GetByPost(postId));
+        return Ok(await _service.GetByPostAsync(postId));
     }
 
-    // POST crear comentario
+    // 🟢 POST crear comentario
     [HttpPost]
-    public IActionResult Create(long postId, [FromBody] CreateCommentDto dto)
+    public async Task<IActionResult> Create(long postId, CreateCommentDto dto)
     {
-        var post = _postService.GetById(postId);
-
+        // 🔥 Validar que el post exista (PRO nivel defensa)
+        var post = await _postService.GetByIdAsync(postId);
         if (post == null)
-            return NotFound();
+            return BadRequest("El post no existe ❌");
 
         var comment = new Comment
         {
-            Text = dto.Text
+            Text = dto.Text,
+            PostId = postId
         };
 
-        var created = _service.Create(postId, comment);
-        return CreatedAtAction(nameof(GetByPost), new { postId = postId }, created);
+        return Ok(await _service.CreateAsync(comment));
     }
 
-    // PUT actualizar comentario
+    // 🟡 PUT actualizar comentario
     [HttpPut("{id}")]
-    public IActionResult Update(long id, [FromBody] UpdateCommentDto dto)
+    public async Task<IActionResult> Update(long id, UpdateCommentDto dto)
     {
         var comment = new Comment
         {
             Text = dto.Text
         };
 
-        var updated = _service.Update(id, comment);
-        if (updated == null) return NotFound();
-
-        return Ok(updated);
+        var ok = await _service.UpdateAsync(id, comment);
+        return ok ? NoContent() : NotFound();
     }
 
-    // DELETE comentario
+    // 🔴 DELETE comentario
     [HttpDelete("{id}")]
-    public IActionResult Delete(long id)
+    public async Task<IActionResult> Delete(long id)
     {
-        if (!_service.Delete(id)) return NotFound();
-
-        return NoContent();
+        var ok = await _service.DeleteAsync(id);
+        return ok ? NoContent() : NotFound();
     }
 }

@@ -17,23 +17,20 @@ public class CampaignController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetAll()
+    public async Task<IActionResult> GetAll()
     {
-        return Ok(_service.GetAll());
+        return Ok(await _service.GetAllAsync());
     }
 
     [HttpGet("{id}")]
-    public IActionResult GetById(int id)
+    public async Task<IActionResult> GetById(int id)
     {
-        var campaign = _service.GetById(id);
-
-        if (campaign == null) return NotFound();
-
-        return Ok(campaign);
+        var campaign = await _service.GetByIdAsync(id);
+        return campaign == null ? NotFound() : Ok(campaign);
     }
 
     [HttpPost]
-    public IActionResult Create(CreateCampaignDto dto)
+    public async Task<IActionResult> Create(CreateCampaignDto dto)
     {
         var campaign = new Campaign
         {
@@ -42,14 +39,11 @@ public class CampaignController : ControllerBase
             Description = dto.Description
         };
 
-        var created = _service.Create(campaign);
-
-        // Devuelve 201 Created con la ubicaci�n del recurso (CreatedAtAction)
-        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+        return Ok(await _service.CreateAsync(campaign));
     }
 
     [HttpPut("{id}")]
-    public IActionResult Update(int id, UpdateCampaignDto dto)
+    public async Task<IActionResult> Update(int id, UpdateCampaignDto dto)
     {
         var campaign = new Campaign
         {
@@ -60,21 +54,14 @@ public class CampaignController : ControllerBase
             Description = dto.Description
         };
 
-        var updated = _service.Update(id, campaign);
-
-        if (updated == null) return NotFound();
-
-        return Ok(updated);
+        var ok = await _service.UpdateAsync(id, campaign);
+        return ok ? NoContent() : NotFound();
     }
 
     [HttpDelete("{id}")]
-    public IActionResult Delete(int id)
+    public async Task<IActionResult> Delete(int id)
     {
-        var deleted = _service.Delete(id);
-
-        if (!deleted) return NotFound();
-
-        // Devuelve 204 No Content cuando la eliminaci�n es correcta
-        return NoContent();
+        var ok = await _service.DeleteAsync(id);
+        return ok ? NoContent() : NotFound();
     }
 }

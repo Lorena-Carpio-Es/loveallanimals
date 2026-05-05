@@ -5,14 +5,9 @@ namespace Love4AnimalsAPI.Interfaces;
 
 public interface ICampaignService
 {
-    List<Campaign> GetAll();
-
-    Campaign GetById(int id);
-
-    Campaign Create(Campaign campaign);
-
-    Campaign Update(int id, Campaign campaign);
-
-    bool Delete(int id);
-
+    Task<List<Campaign>> GetAllAsync();
+    Task<Campaign?> GetByIdAsync(int id);
+    Task<Campaign> CreateAsync(Campaign campaign);
+    Task<bool> UpdateAsync(int id, Campaign campaign);
+    Task<bool> DeleteAsync(int id);
 }

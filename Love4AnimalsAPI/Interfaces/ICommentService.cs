@@ -4,9 +4,8 @@ namespace Love4AnimalsAPI.Interfaces;
 
 public interface ICommentService
 {
-    List<Comment> GetByPost(long postId);
-    Comment Create(long postId, Comment comment);
-    Comment Update(long id, Comment comment);
-    bool Delete(long id);
-
+    Task<List<Comment>> GetByPostAsync(long postId);
+    Task<Comment> CreateAsync(Comment comment);
+    Task<bool> DeleteAsync(long id);
+    Task<bool> UpdateAsync(long id, Comment comment); 
 }

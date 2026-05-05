@@ -7,8 +7,8 @@ public class CreatePostDto
     public string Title { get; set; }
     public double FundraisingGoal { get; set; }
     public string Description { get; set; }
-    public string    Image { get; set; }
-    public long UserId { get; set; }
-    public long CampaignId { get; set; }
+    public IFormFile Image { get; set; }
 
+    public long UserId { get; set; }      // 🔥 NECESARIO
+    public long CampaignId { get; set; }  // 🔥 NECESARIO
 }
