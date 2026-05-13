@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using Love4AnimalsAPI.Models;
+using Love4AnimalsAPI.Interfaces;
 
 namespace Love4AnimalsAPI.Repositories;
 
-public class UserRepository
+public class UserRepository 
 {
     private static readonly List<User> users = new();
     private static int nextId = 1;
@@ -34,6 +35,7 @@ public class UserRepository
     {
         var existing = users.FirstOrDefault(u => u.Id == id);
         if (existing == null) return false;
+
         users.Remove(existing);
         return true;
     }

@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Love4AnimalsAPI.Models;
+using Love4AnimalsAPI.Interfaces;
 
 namespace Love4AnimalsAPI.Repositories;
 
-public class CampaignRepository
+public class CampaignRepository 
 {
     private static readonly List<Campaign> campaigns = new();
     private static int nextId = 1;
@@ -33,7 +34,6 @@ public class CampaignRepository
         existing.CurrentAmount = campaign.CurrentAmount;
         existing.Description = campaign.Description;
 
-       
         existing.Status = campaign.Status;
 
         return existing;
@@ -43,6 +43,7 @@ public class CampaignRepository
     {
         var campaign = campaigns.FirstOrDefault(c => c.Id == id);
         if (campaign == null) return false;
+
         campaigns.Remove(campaign);
         return true;
     }

@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Love4AnimalsAPI.Models;
+using Love4AnimalsAPI.Interfaces;
 
 namespace Love4AnimalsAPI.Repositories;
 
-public class PostRepository
+public class PostRepository 
 {
     private static readonly List<Post> posts = new();
     private static long nextId = 1;
@@ -58,5 +59,3 @@ public class PostRepository
         if (p != null) p.QuantityShared++;
     }
 }
-
-

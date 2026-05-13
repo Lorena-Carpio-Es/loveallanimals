@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Love4AnimalsAPI.Models;
+using Love4AnimalsAPI.Interfaces;
 
 namespace Love4AnimalsAPI.Repositories;
 
-public class CommentRepository
+public class CommentRepository 
 {
     private static readonly List<Comment> comments = new();
     private static long nextId = 1;
@@ -25,6 +26,7 @@ public class CommentRepository
     {
         var existing = comments.FirstOrDefault(c => c.Id == id);
         if (existing == null) return null;
+
         existing.Text = comment.Text;
         return existing;
     }
@@ -33,6 +35,7 @@ public class CommentRepository
     {
         var existing = comments.FirstOrDefault(c => c.Id == id);
         if (existing == null) return false;
+
         comments.Remove(existing);
         return true;
     }
