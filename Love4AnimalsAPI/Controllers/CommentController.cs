@@ -19,18 +19,18 @@ public class CommentController : ControllerBase
         _postService = postService;
     }
 
-    // 🔵 GET comentarios por post
+   
     [HttpGet]
     public async Task<IActionResult> GetByPost(long postId)
     {
         return Ok(await _service.GetByPostAsync(postId));
     }
 
-    // 🟢 POST crear comentario
+    
     [HttpPost]
     public async Task<IActionResult> Create(long postId, CreateCommentDto dto)
     {
-        // 🔥 Validar que el post exista (PRO nivel defensa)
+      
         var post = await _postService.GetByIdAsync(postId);
         if (post == null)
             return BadRequest("El post no existe ❌");
@@ -44,7 +44,7 @@ public class CommentController : ControllerBase
         return Ok(await _service.CreateAsync(comment));
     }
 
-    // 🟡 PUT actualizar comentario
+   
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(long id, UpdateCommentDto dto)
     {
@@ -57,7 +57,7 @@ public class CommentController : ControllerBase
         return ok ? NoContent() : NotFound();
     }
 
-    // 🔴 DELETE comentario
+    
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(long id)
     {

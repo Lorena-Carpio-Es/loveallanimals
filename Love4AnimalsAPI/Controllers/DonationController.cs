@@ -1,69 +1,88 @@
 using Microsoft.AspNetCore.Mvc;
 using Love4AnimalsAPI.Interfaces;
 using Love4AnimalsAPI.Models;
+using Love4AnimalsAPI.Dto;
 
 namespace Love4AnimalsAPI.Controllers;
 
 [ApiController]
-[Route("v1/[controller]")]
-public class DonationsController : ControllerBase
+[Route("v1/donations")]
+public class DonationController : ControllerBase
 {
-    private readonly IDonationService _donationService;
+    private readonly IDonationService _service;
 
-    public DonationsController(IDonationService donationService)
+    public DonationController(IDonationService service)
     {
-        _donationService = donationService;
+        _service = service;
     }
 
-    // GET /v1/campaigns/{id}/donations
-    [HttpGet("campaigns/{campaignId}/donations")]
-    public ActionResult<List<Donation>> GetByCampaign(int campaignId)
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
     {
-        var donations = _donationService.GetByCampaignId(campaignId);
-        return Ok(donations);
+        return Ok(await _service.GetAllAsync());
     }
 
-    // POST /v1/campaigns/{id}/donations
-    [HttpPost("campaigns/{campaignId}/donations")]
-    public ActionResult<Donation> Create(int campaignId, [FromBody] Donation donation)
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(long id)
     {
-        donation.CampaignId = campaignId;
-        var created = _donationService.Create(donation);
-        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+        var donation = await _service.GetByIdAsync(id);
+
+        return donation == null ? NotFound() : Ok(donation);
     }
 
-    // GET /v1/user/{id}/donations
-    [HttpGet("user/{userId}/donations")]
-    public ActionResult<List<Donation>> GetByUser(int userId)
+    [HttpGet("campaign/{campaignId}")]
+    public async Task<IActionResult> GetByCampaign(long campaignId)
     {
-        var donations = _donationService.GetByUserId(userId);
-        return Ok(donations);
+        return Ok(await _service.GetByCampaignAsync(campaignId));
     }
 
-    // GET /v1/donations/{id}
-    [HttpGet("donations/{id}")]
-    public ActionResult<Donation> GetById(int id)
+    [HttpGet("user/{userId}")]
+    public async Task<IActionResult> GetByUser(long userId)
     {
-        var donation = _donationService.GetById(id);
-        if (donation == null) return NotFound();
-        return Ok(donation);
+        return Ok(await _service.GetByUserAsync(userId));
     }
 
-    // PUT /v1/donations/{id}
-    [HttpPut("donations/{id}")]
-    public ActionResult<Donation> Update(int id, [FromBody] Donation donation)
+    [HttpPost]
+    public async Task<IActionResult> Create(CreateDonationDto dto)
     {
-        var updated = _donationService.Update(id, donation);
-        if (updated == null) return NotFound();
-        return Ok(updated);
+        try
+        {
+            var donation = new Donation
+            {
+                Amount = dto.Amount,
+                UserId = dto.UserId,
+                CampaignId = dto.CampaignId
+            };
+
+            var created = await _service.CreateAsync(donation);
+
+            return Ok(created);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
-    // DELETE /v1/donations/{id}
-    [HttpDelete("donations/{id}")]
-    public ActionResult Delete(int id)
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(long id, UpdateDonationDto dto)
     {
-        var deleted = _donationService.Delete(id);
-        if (!deleted) return NotFound();
-        return NoContent();
+        var donation = new Donation
+        {
+            Amount = dto.Amount,
+            Status = dto.Status
+        };
+
+        var ok = await _service.UpdateAsync(id, donation);
+
+        return ok ? NoContent() : NotFound();
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(long id)
+    {
+        var ok = await _service.DeleteAsync(id);
+
+        return ok ? NoContent() : NotFound();
     }
 }

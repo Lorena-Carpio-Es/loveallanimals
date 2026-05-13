@@ -1,34 +1,99 @@
+using Microsoft.EntityFrameworkCore;
+using Love4AnimalsAPI.Data;
 using Love4AnimalsAPI.Interfaces;
 using Love4AnimalsAPI.Models;
-using Love4AnimalsAPI.Repositories;
 
 namespace Love4AnimalsAPI.Services;
 
 public class DonationService : IDonationService
 {
-    private readonly DonationRepository _repo;
+    private readonly AppDbContext _context;
 
-    public DonationService(DonationRepository repo)
+    public DonationService(AppDbContext context)
     {
-        _repo = repo;
+        _context = context;
     }
 
-    public List<Donation> GetAll() => _repo.GetAll();
-
-    public Donation GetById(int id) => _repo.GetById(id);
-
-    public Donation Create(Donation donation)
+    public async Task<List<Donation>> GetAllAsync()
     {
+        return await _context.Donations
+            .Include(d => d.User)
+            .Include(d => d.Campaign)
+            .ToListAsync();
+    }
+
+    public async Task<Donation?> GetByIdAsync(long id)
+    {
+        return await _context.Donations
+            .Include(d => d.User)
+            .Include(d => d.Campaign)
+            .FirstOrDefaultAsync(d => d.Id == id);
+    }
+
+    public async Task<List<Donation>> GetByCampaignAsync(long campaignId)
+    {
+        return await _context.Donations
+            .Include(d => d.User)
+            .Where(d => d.CampaignId == campaignId)
+            .ToListAsync();
+    }
+
+    public async Task<List<Donation>> GetByUserAsync(long userId)
+    {
+        return await _context.Donations
+            .Include(d => d.Campaign)
+            .Where(d => d.UserId == userId)
+            .ToListAsync();
+    }
+
+    public async Task<Donation> CreateAsync(Donation donation)
+    {
+        var user = await _context.Users.FindAsync(donation.UserId);
+
+        if (user == null)
+            throw new Exception("El usuario no existe");
+
+        var campaign = await _context.Campaigns.FindAsync(donation.CampaignId);
+
+        if (campaign == null)
+            throw new Exception("La campaña no existe");
+
         donation.Date = DateTime.Now;
-        donation.Status = DonationStatus.Pendiente;
-        return _repo.Create(donation);
+        donation.Status = DonationStatus.Pending;
+
+        _context.Donations.Add(donation);
+
+        await _context.SaveChangesAsync();
+
+        return donation;
     }
 
-    public Donation Update(int id, Donation donation) => _repo.Update(id, donation);
+    public async Task<bool> UpdateAsync(long id, Donation donation)
+    {
+        var existing = await _context.Donations.FindAsync(id);
 
-    public bool Delete(int id) => _repo.Delete(id);
+        if (existing == null)
+            return false;
 
-    public List<Donation> GetByCampaignId(int campaignId) => _repo.GetByCampaignId(campaignId);
+        existing.Amount = donation.Amount;
+        existing.Status = donation.Status;
 
-    public List<Donation> GetByUserId(int userId) => _repo.GetByUserId(userId);
+        await _context.SaveChangesAsync();
+
+        return true;
+    }
+
+    public async Task<bool> DeleteAsync(long id)
+    {
+        var donation = await _context.Donations.FindAsync(id);
+
+        if (donation == null)
+            return false;
+
+        _context.Donations.Remove(donation);
+
+        await _context.SaveChangesAsync();
+
+        return true;
+    }
 }

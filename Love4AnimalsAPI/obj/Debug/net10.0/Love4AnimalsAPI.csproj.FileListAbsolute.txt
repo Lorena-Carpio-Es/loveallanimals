@@ -162,3 +162,5 @@ C:\Users\KARIME\OneDrive\Documentos\Proyecto2SWL\Love4AnimalsAPI\bin\Debug\net10
 C:\Users\KARIME\OneDrive\Documentos\Proyecto2SWL\Love4AnimalsAPI\bin\Debug\net10.0\runtimes\win-arm64\native\Microsoft.Data.SqlClient.SNI.dll
 C:\Users\KARIME\OneDrive\Documentos\Proyecto2SWL\Love4AnimalsAPI\bin\Debug\net10.0\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
 C:\Users\KARIME\OneDrive\Documentos\Proyecto2SWL\Love4AnimalsAPI\bin\Debug\net10.0\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
+C:\Users\KARIME\OneDrive\Documentos\Proyecto2SWL\Love4AnimalsAPI\bin\Debug\net10.0\Npgsql.dll
+C:\Users\KARIME\OneDrive\Documentos\Proyecto2SWL\Love4AnimalsAPI\bin\Debug\net10.0\Npgsql.EntityFrameworkCore.PostgreSQL.dll

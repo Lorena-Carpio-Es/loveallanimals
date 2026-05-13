@@ -9,6 +9,6 @@ public class CreatePostDto
     public string Description { get; set; }
     public IFormFile Image { get; set; }
 
-    public long UserId { get; set; }      // 🔥 NECESARIO
-    public long CampaignId { get; set; }  // 🔥 NECESARIO
+    public long UserId { get; set; }    
+    public long CampaignId { get; set; }  
 }
