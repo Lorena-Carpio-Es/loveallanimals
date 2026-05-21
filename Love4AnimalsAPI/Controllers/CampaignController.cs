@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Love4AnimalsAPI.Interfaces;
 using Love4AnimalsAPI.Models;
 using Love4AnimalsAPI.Dto;
+using Love4AnimalsAPI.Repositories;
 
 namespace Love4AnimalsAPI.Controllers;
 

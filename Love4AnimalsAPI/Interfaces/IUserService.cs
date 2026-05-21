@@ -1,4 +1,3 @@
-using System;
 using Love4AnimalsAPI.Models;
 
 namespace Love4AnimalsAPI.Interfaces;
@@ -6,8 +5,14 @@ namespace Love4AnimalsAPI.Interfaces;
 public interface IUserService
 {
     Task<List<User>> GetAllAsync();
-    Task<User?> GetByIdAsync(int id);
-    Task<User> CreateAsync(User user);
-    Task<bool> UpdateAsync(int id, User user);
-    Task<bool> DeleteAsync(int id);
+
+    Task<User?> GetByIdAsync(long id);
+
+    Task<User> RegisterAsync(User user, string password);
+
+    Task<User?> LoginAsync(string email, string password);
+
+    Task<bool> UpdateAsync(long id, User user);
+
+    Task<bool> DeleteAsync(long id);
 }

@@ -17,7 +17,6 @@ public class Post
     public int QuantityLikes { get; set; }
     public int QuantityShared { get; set; }
 
-    // 🔥 RELACIONES
     public long UserId { get; set; }
     public User User { get; set; }
 

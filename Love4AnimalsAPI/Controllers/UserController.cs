@@ -19,30 +19,88 @@ public class UserController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        return Ok(await _service.GetAllAsync());
+        var users = await _service.GetAllAsync();
+
+        var response = users.Select(u => new UserResponseDto
+        {
+            Id = u.Id,
+            Name = u.Name,
+            Email = u.Email
+        });
+
+        return Ok(response);
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
+    public async Task<IActionResult> GetById(long id)
     {
         var user = await _service.GetByIdAsync(id);
-        return user == null ? NotFound() : Ok(user);
-    }
 
-    [HttpPost]
-    public async Task<IActionResult> Create(CreateUserDto dto)
-    {
-        var user = new User
+        if (user == null)
+            return NotFound();
+
+        var response = new UserResponseDto
         {
-            Name = dto.Name,
-            Email = dto.Email
+            Id = user.Id,
+            Name = user.Name,
+            Email = user.Email
         };
 
-        return Ok(await _service.CreateAsync(user));
+        return Ok(response);
+    }
+
+    // REGISTRO
+    [HttpPost("register")]
+    public async Task<IActionResult> Register(RegisterUserDto dto)
+    {
+        try
+        {
+            var user = new User
+            {
+                Name = dto.Name,
+                Email = dto.Email
+            };
+
+            var created = await _service.RegisterAsync(user, dto.Password);
+
+            var response = new UserResponseDto
+            {
+                Id = created.Id,
+                Name = created.Name,
+                Email = created.Email
+            };
+
+            return Ok(response);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    // LOGIN
+    [HttpPost("login")]
+    public async Task<IActionResult> Login(LoginUserDto dto)
+    {
+        var user = await _service.LoginAsync(dto.Email, dto.Password);
+
+        if (user == null)
+            return Unauthorized("Email o contraseña incorrectos");
+
+        return Ok(new
+        {
+            message = "Login exitoso",
+            user = new UserResponseDto
+            {
+                Id = user.Id,
+                Name = user.Name,
+                Email = user.Email
+            }
+        });
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, UpdateUserDto dto)
+    public async Task<IActionResult> Update(long id, UpdateUserDto dto)
     {
         var user = new User
         {
@@ -51,13 +109,15 @@ public class UserController : ControllerBase
         };
 
         var ok = await _service.UpdateAsync(id, user);
+
         return ok ? NoContent() : NotFound();
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Delete(long id)
     {
         var ok = await _service.DeleteAsync(id);
+
         return ok ? NoContent() : NotFound();
     }
 }
