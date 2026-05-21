@@ -17,7 +17,7 @@ public class CommentRepository
     {
         comment.Id = nextId++;
         comment.PostId = postId;
-        comment.Date = DateTime.Now;
+      //  comment.Date = DateTime.Now;
         comments.Add(comment);
         return comment;
     }

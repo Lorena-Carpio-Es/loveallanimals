@@ -25,6 +25,7 @@ public class CommentService : ICommentService
 
     public async Task<Comment> CreateAsync(Comment comment)
     {
+        comment.Date = DateTime.Now;
         _context.Comments.Add(comment);
         await _context.SaveChangesAsync();
         return comment;

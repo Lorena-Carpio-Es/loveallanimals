@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Love4AnimalsAPI.Data;
 using Love4AnimalsAPI.Interfaces;
 using Love4AnimalsAPI.Services;
-//using Love4AnimalsAPI.Repositories;
+using Love4AnimalsAPI.Repositories;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -29,6 +29,14 @@ builder.Services.AddScoped<ICampaignService, CampaignService>();
 builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IDonationService, DonationService>();
+
+/*
+builder.Services.AddSingleton<UserRepository>();
+builder.Services.AddSingleton<CampaignRepository>();
+builder.Services.AddSingleton<PostRepository>();
+builder.Services.AddSingleton<CommentRepository>();
+builder.Services.AddSingleton<DonationRepository>();
+*/
 
 var app = builder.Build();
 
