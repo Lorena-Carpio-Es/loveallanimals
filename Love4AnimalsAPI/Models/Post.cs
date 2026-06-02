@@ -12,7 +12,7 @@ public class Post
     public string Image { get; set; }
 
     public DateTime CreationDate { get; set; }
-    public string State { get; set; }
+    public CampaignStatus  State { get; set; }
 
     public int QuantityLikes { get; set; }
     public int QuantityShared { get; set; }

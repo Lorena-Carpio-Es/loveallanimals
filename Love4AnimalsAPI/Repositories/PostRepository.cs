@@ -20,8 +20,8 @@ public class PostRepository
     public Post Create(Post pub)
     {
         pub.Id = nextId++;
-        pub.CreationDate = DateTime.Now;
-        pub.State ??= "Active";
+       pub.CreationDate = DateTime.UtcNow;
+        pub.State = CampaignStatus.Active;
         posts.Add(pub);
         return pub;
     }
