@@ -16,6 +16,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 );
 
 
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration["Redis:ConnectionString"];
+    options.InstanceName = builder.Configuration["Redis:InstanceName"];
+});
+
 builder.Services.AddControllers()
     .AddJsonOptions(opts =>
     {
@@ -32,6 +38,7 @@ builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IDonationService, DonationService>();
 
+builder.Services.AddScoped<ICacheService, CacheService>();
 /*
 builder.Services.AddSingleton<UserRepository>();
 builder.Services.AddSingleton<CampaignRepository>();
@@ -39,6 +46,8 @@ builder.Services.AddSingleton<PostRepository>();
 builder.Services.AddSingleton<CommentRepository>();
 builder.Services.AddSingleton<DonationRepository>();
 */
+
+
 
 var app = builder.Build();
 
