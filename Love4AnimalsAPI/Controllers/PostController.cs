@@ -3,6 +3,7 @@ using Love4AnimalsAPI.Interfaces;
 using Love4AnimalsAPI.Models;
 using Love4AnimalsAPI.Dto;
 using Love4AnimalsAPI.Repositories;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Love4AnimalsAPI.Controllers;
 
@@ -18,10 +19,12 @@ public class PublicacionController : ControllerBase
     }
 
     [HttpGet]
+    [EnableRateLimiting("PublicPolicy")]
     public async Task<IActionResult> GetAll()
         => Ok(await _service.GetAllAsync());
 
     [HttpGet("{id}")]
+    [EnableRateLimiting("PublicPolicy")]
     public async Task<IActionResult> GetById(long id)
     {
         var post = await _service.GetByIdAsync(id);

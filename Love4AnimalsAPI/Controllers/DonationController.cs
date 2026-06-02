@@ -3,6 +3,7 @@ using Love4AnimalsAPI.Interfaces;
 using Love4AnimalsAPI.Models;
 using Love4AnimalsAPI.Dto;
 using Love4AnimalsAPI.Repositories;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Love4AnimalsAPI.Controllers;
 
@@ -18,6 +19,7 @@ public class DonationController : ControllerBase
     }
 
     [HttpGet]
+    [EnableRateLimiting("PublicPolicy")]
     public async Task<IActionResult> GetAll()
     {
         return Ok(await _service.GetAllAsync());
@@ -32,12 +34,14 @@ public class DonationController : ControllerBase
     }
 
     [HttpGet("campaign/{campaignId}")]
+    [EnableRateLimiting("PublicPolicy")]
     public async Task<IActionResult> GetByCampaign(long campaignId)
     {
         return Ok(await _service.GetByCampaignAsync(campaignId));
     }
 
     [HttpGet("user/{userId}")]
+    [EnableRateLimiting("PublicPolicy")]
     public async Task<IActionResult> GetByUser(long userId)
     {
         return Ok(await _service.GetByUserAsync(userId));

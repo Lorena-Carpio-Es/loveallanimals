@@ -8,42 +8,93 @@ namespace Love4AnimalsAPI.Services;
 public class DonationService : IDonationService
 {
     private readonly AppDbContext _context;
+    private readonly ICacheService _cache;
 
-    public DonationService(AppDbContext context)
+    public DonationService(AppDbContext context, ICacheService cache)
     {
         _context = context;
+        _cache = cache;
     }
 
     public async Task<List<Donation>> GetAllAsync()
     {
-        return await _context.Donations
+        const string cacheKey = "donations:all";
+
+        var cachedDonations = await _cache.GetAsync<List<Donation>>(cacheKey);
+
+        if (cachedDonations != null)
+            return cachedDonations;
+
+        var donations = await _context.Donations
+            .AsNoTracking()
             .Include(d => d.User)
             .Include(d => d.Campaign)
             .ToListAsync();
+
+        await _cache.SetAsync(cacheKey, donations, 5);
+
+        return donations;
     }
 
     public async Task<Donation?> GetByIdAsync(long id)
     {
-        return await _context.Donations
+        var cacheKey = $"donations:{id}";
+
+        var cachedDonation = await _cache.GetAsync<Donation>(cacheKey);
+
+        if (cachedDonation != null)
+            return cachedDonation;
+
+        var donation = await _context.Donations
+            .AsNoTracking()
             .Include(d => d.User)
             .Include(d => d.Campaign)
             .FirstOrDefaultAsync(d => d.Id == id);
+
+        if (donation != null)
+            await _cache.SetAsync(cacheKey, donation, 5);
+
+        return donation;
     }
 
     public async Task<List<Donation>> GetByCampaignAsync(long campaignId)
     {
-        return await _context.Donations
+        var cacheKey = $"donations:campaign:{campaignId}";
+
+        var cachedDonations = await _cache.GetAsync<List<Donation>>(cacheKey);
+
+        if (cachedDonations != null)
+            return cachedDonations;
+
+        var donations = await _context.Donations
+            .AsNoTracking()
             .Include(d => d.User)
             .Where(d => d.CampaignId == campaignId)
             .ToListAsync();
+
+        await _cache.SetAsync(cacheKey, donations, 5);
+
+        return donations;
     }
 
     public async Task<List<Donation>> GetByUserAsync(long userId)
     {
-        return await _context.Donations
+        var cacheKey = $"donations:user:{userId}";
+
+        var cachedDonations = await _cache.GetAsync<List<Donation>>(cacheKey);
+
+        if (cachedDonations != null)
+            return cachedDonations;
+
+        var donations = await _context.Donations
+            .AsNoTracking()
             .Include(d => d.Campaign)
             .Where(d => d.UserId == userId)
             .ToListAsync();
+
+        await _cache.SetAsync(cacheKey, donations, 5);
+
+        return donations;
     }
 
     public async Task<Donation> CreateAsync(Donation donation)
@@ -62,8 +113,13 @@ public class DonationService : IDonationService
         donation.Status = DonationStatus.Pending;
 
         _context.Donations.Add(donation);
-
         await _context.SaveChangesAsync();
+
+        await _cache.RemoveAsync("donations:all");
+        await _cache.RemoveAsync($"donations:campaign:{donation.CampaignId}");
+        await _cache.RemoveAsync($"donations:user:{donation.UserId}");
+        await _cache.RemoveAsync("campaigns:all");
+        await _cache.RemoveAsync($"campaigns:{donation.CampaignId}");
 
         return donation;
     }
@@ -80,6 +136,11 @@ public class DonationService : IDonationService
 
         await _context.SaveChangesAsync();
 
+        await _cache.RemoveAsync("donations:all");
+        await _cache.RemoveAsync($"donations:{id}");
+        await _cache.RemoveAsync($"donations:campaign:{existing.CampaignId}");
+        await _cache.RemoveAsync($"donations:user:{existing.UserId}");
+
         return true;
     }
 
@@ -90,9 +151,18 @@ public class DonationService : IDonationService
         if (donation == null)
             return false;
 
-        _context.Donations.Remove(donation);
+        var campaignId = donation.CampaignId;
+        var userId = donation.UserId;
 
+        _context.Donations.Remove(donation);
         await _context.SaveChangesAsync();
+
+        await _cache.RemoveAsync("donations:all");
+        await _cache.RemoveAsync($"donations:{id}");
+        await _cache.RemoveAsync($"donations:campaign:{campaignId}");
+        await _cache.RemoveAsync($"donations:user:{userId}");
+        await _cache.RemoveAsync("campaigns:all");
+        await _cache.RemoveAsync($"campaigns:{campaignId}");
 
         return true;
     }

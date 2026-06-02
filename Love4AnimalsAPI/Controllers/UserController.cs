@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.RateLimiting;
 using Love4AnimalsAPI.Interfaces;
 using Love4AnimalsAPI.Dto;
 using Love4AnimalsAPI.Models;
@@ -17,6 +19,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Roles = "Misionero")]
     public async Task<IActionResult> GetAll()
     {
         var users = await _service.GetAllAsync();
@@ -25,13 +28,15 @@ public class UserController : ControllerBase
         {
             Id = u.Id,
             Name = u.Name,
-            Email = u.Email
+            Email = u.Email,
+            Role = u.Role.ToString()
         });
 
         return Ok(response);
     }
 
     [HttpGet("{id}")]
+    [Authorize]
     public async Task<IActionResult> GetById(long id)
     {
         var user = await _service.GetByIdAsync(id);
@@ -39,18 +44,18 @@ public class UserController : ControllerBase
         if (user == null)
             return NotFound();
 
-        var response = new UserResponseDto
+        return Ok(new UserResponseDto
         {
             Id = user.Id,
             Name = user.Name,
-            Email = user.Email
-        };
-
-        return Ok(response);
+            Email = user.Email,
+            Role = user.Role.ToString()
+        });
     }
 
-    
     [HttpPost("register")]
+    [AllowAnonymous]
+    [EnableRateLimiting("PublicPolicy")]
     public async Task<IActionResult> Register(RegisterUserDto dto)
     {
         try
@@ -58,19 +63,19 @@ public class UserController : ControllerBase
             var user = new User
             {
                 Name = dto.Name,
-                Email = dto.Email
+                Email = dto.Email,
+                Role = dto.Role
             };
 
             var created = await _service.RegisterAsync(user, dto.Password);
 
-            var response = new UserResponseDto
+            return Ok(new UserResponseDto
             {
                 Id = created.Id,
                 Name = created.Name,
-                Email = created.Email
-            };
-
-            return Ok(response);
+                Email = created.Email,
+                Role = created.Role.ToString()
+            });
         }
         catch (Exception ex)
         {
@@ -78,28 +83,33 @@ public class UserController : ControllerBase
         }
     }
 
-    
     [HttpPost("login")]
+    [AllowAnonymous]
+    [EnableRateLimiting("PublicPolicy")]
     public async Task<IActionResult> Login(LoginUserDto dto)
     {
-        var user = await _service.LoginAsync(dto.Email, dto.Password);
+        var response = await _service.LoginAsync(dto.Email, dto.Password);
 
-        if (user == null)
+        if (response == null)
             return Unauthorized("Email o contraseña incorrectos");
 
-        return Ok(new
-        {
-            message = "Login exitoso",
-            user = new UserResponseDto
-            {
-                Id = user.Id,
-                Name = user.Name,
-                Email = user.Email
-            }
-        });
+        return Ok(response);
+    }
+
+    [HttpPost("refresh-token")]
+    [AllowAnonymous]
+    public async Task<IActionResult> RefreshToken(RefreshTokenDto dto)
+    {
+        var response = await _service.RefreshTokenAsync(dto.RefreshToken);
+
+        if (response == null)
+            return Unauthorized("Refresh token inválido o expirado");
+
+        return Ok(response);
     }
 
     [HttpPut("{id}")]
+    [Authorize]
     public async Task<IActionResult> Update(long id, UpdateUserDto dto)
     {
         var user = new User
@@ -114,6 +124,7 @@ public class UserController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Misionero")]
     public async Task<IActionResult> Delete(long id)
     {
         var ok = await _service.DeleteAsync(id);

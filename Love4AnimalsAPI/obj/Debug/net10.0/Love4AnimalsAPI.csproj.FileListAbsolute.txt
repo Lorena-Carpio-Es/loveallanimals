@@ -168,3 +168,4 @@ C:\Users\KARIME\OneDrive\Documentos\Proyecto2SWL\Love4AnimalsAPI\bin\Debug\net10
 C:\Users\KARIME\OneDrive\Documentos\Proyecto2SWL\Love4AnimalsAPI\bin\Debug\net10.0\Microsoft.Extensions.Caching.StackExchangeRedis.dll
 C:\Users\KARIME\OneDrive\Documentos\Proyecto2SWL\Love4AnimalsAPI\bin\Debug\net10.0\Pipelines.Sockets.Unofficial.dll
 C:\Users\KARIME\OneDrive\Documentos\Proyecto2SWL\Love4AnimalsAPI\bin\Debug\net10.0\StackExchange.Redis.dll
+C:\Users\KARIME\OneDrive\Documentos\Proyecto2SWL\Love4AnimalsAPI\bin\Debug\net10.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
