@@ -49,7 +49,7 @@ public class UserController : ControllerBase
         return Ok(response);
     }
 
-    // REGISTRO
+    
     [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterUserDto dto)
     {
@@ -78,7 +78,7 @@ public class UserController : ControllerBase
         }
     }
 
-    // LOGIN
+    
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginUserDto dto)
     {

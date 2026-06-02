@@ -6,10 +6,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Love4AnimalsAPI.Migrations
 {
-    /// <inheritdoc />
+
     public partial class AddDonations : Migration
     {
-        /// <inheritdoc />
+       
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<long>(

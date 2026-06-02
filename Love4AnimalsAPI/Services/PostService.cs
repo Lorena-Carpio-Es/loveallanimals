@@ -34,7 +34,7 @@ public class PostService : IPostService
 
     public async Task<Post> CreateAsync(Post post)
     {
-        post.CreationDate = DateTime.Now;
+       post.CreationDate = DateTime.UtcNow;
         post.State = "Active";
 
         _context.Posts.Add(post);

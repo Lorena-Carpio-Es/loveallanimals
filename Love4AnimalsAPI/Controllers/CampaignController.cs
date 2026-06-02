@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Love4AnimalsAPI.Interfaces;
 using Love4AnimalsAPI.Models;
 using Love4AnimalsAPI.Dto;
-using Love4AnimalsAPI.Repositories;
 
 namespace Love4AnimalsAPI.Controllers;
 
@@ -24,9 +23,10 @@ public class CampaignController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
+    public async Task<IActionResult> GetById(long id)
     {
         var campaign = await _service.GetByIdAsync(id);
+
         return campaign == null ? NotFound() : Ok(campaign);
     }
 
@@ -44,7 +44,7 @@ public class CampaignController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, UpdateCampaignDto dto)
+    public async Task<IActionResult> Update(long id, UpdateCampaignDto dto)
     {
         var campaign = new Campaign
         {
@@ -56,13 +56,15 @@ public class CampaignController : ControllerBase
         };
 
         var ok = await _service.UpdateAsync(id, campaign);
+
         return ok ? NoContent() : NotFound();
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Delete(long id)
     {
         var ok = await _service.DeleteAsync(id);
+
         return ok ? NoContent() : NotFound();
     }
 }

@@ -18,13 +18,15 @@ public class CampaignService : ICampaignService
     {
         return await _context.Campaigns
             .Include(c => c.Posts)
+            .Include(c => c.Donations)
             .ToListAsync();
     }
 
-    public async Task<Campaign?> GetByIdAsync(int id)
+    public async Task<Campaign?> GetByIdAsync(long id)
     {
         return await _context.Campaigns
             .Include(c => c.Posts)
+            .Include(c => c.Donations)
             .FirstOrDefaultAsync(c => c.Id == id);
     }
 
@@ -38,7 +40,7 @@ public class CampaignService : ICampaignService
         return campaign;
     }
 
-    public async Task<bool> UpdateAsync(int id, Campaign campaign)
+    public async Task<bool> UpdateAsync(long id, Campaign campaign)
     {
         var existing = await _context.Campaigns.FindAsync(id);
         if (existing == null) return false;
@@ -53,13 +55,14 @@ public class CampaignService : ICampaignService
         return true;
     }
 
-    public async Task<bool> DeleteAsync(int id)
+    public async Task<bool> DeleteAsync(long id)
     {
         var campaign = await _context.Campaigns.FindAsync(id);
         if (campaign == null) return false;
 
         _context.Campaigns.Remove(campaign);
         await _context.SaveChangesAsync();
+
         return true;
     }
 }

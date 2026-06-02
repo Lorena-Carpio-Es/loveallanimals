@@ -29,38 +29,20 @@ public class PublicacionController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromForm] CreatePostDto dto)
-    {
-    string imageUrl = "";
-
-    if (dto.Image != null)
-    {
-        var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images");
-
-        if (!Directory.Exists(folderPath))
-            Directory.CreateDirectory(folderPath);
-
-        var fileName = Guid.NewGuid() + Path.GetExtension(dto.Image.FileName);
-        var filePath = Path.Combine(folderPath, fileName);
-
-        using var stream = new FileStream(filePath, FileMode.Create);
-        await dto.Image.CopyToAsync(stream);
-
-        imageUrl = $"http://localhost:5116/images/{fileName}";
-    }
-
+public async Task<IActionResult> Create([FromBody] CreatePostDto dto)
+{
     var post = new Post
     {
         Title = dto.Title,
         FundraisingGoal = dto.FundraisingGoal,
         Description = dto.Description,
-        Image = imageUrl,
-        UserId = dto.UserId,           // 🔥 IMPORTANTE
-        CampaignId = dto.CampaignId    // 🔥 IMPORTANTE
+        Image = dto.Image,
+        UserId = dto.UserId,
+        CampaignId = dto.CampaignId
     };
 
     var created = await _service.CreateAsync(post);
 
     return Ok(created);
-   }
+}
 }

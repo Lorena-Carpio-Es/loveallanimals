@@ -58,7 +58,7 @@ public class DonationService : IDonationService
         if (campaign == null)
             throw new Exception("La campaña no existe");
 
-        donation.Date = DateTime.Now;
+        donation.Date = DateTime.UtcNow;
         donation.Status = DonationStatus.Pending;
 
         _context.Donations.Add(donation);
