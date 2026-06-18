@@ -1,0 +1,52 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: love4animals-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: love4animalsdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - love4animals-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d love4animalsdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:latest
+    container_name: love4animals-redis
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: love4animals-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=love4animalsdb;Username=postgres;Password=postgres"
+
+      Redis__ConnectionString: "redis:6379"
+      Redis__InstanceName: "Love4Animals:"
+
+      Jwt__Key: "ESTA_ES_UNA_CLAVE_SUPER_SECRETA_PARA_LOVE4ANIMALS_2026_MUY_LARGA"
+      Jwt__Issuer: "Love4AnimalsAPI"
+      Jwt__Audience: "Love4AnimalsUsers"
+      Jwt__AccessTokenExpirationMinutes: "20"
+      Jwt__RefreshTokenExpirationDays: "7"
+    ports:
+      - "8080:8080"
+
+volumes:
+  love4animals-postgres-data:
