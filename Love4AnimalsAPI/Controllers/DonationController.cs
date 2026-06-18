@@ -18,35 +18,91 @@ public class DonationController : ControllerBase
         _service = service;
     }
 
-    [HttpGet]
-    [EnableRateLimiting("PublicPolicy")]
-    public async Task<IActionResult> GetAll()
+   [HttpGet]
+[EnableRateLimiting("PublicPolicy")]
+public async Task<IActionResult> GetAll()
+{
+    var donations = await _service.GetAllAsync();
+
+    var response = donations.Select(d => new DonationResponseDto
     {
-        return Ok(await _service.GetAllAsync());
-    }
+        Id = d.Id,
+        Amount = d.Amount,
+        Date = d.Date,
+        Status = d.Status.ToString(),
+        UserId = d.UserId,
+        UserName = d.User != null ? d.User.Name : "",
+        CampaignId = d.CampaignId,
+        CampaignTitle = d.Campaign != null ? d.Campaign.Title : ""
+    });
 
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(long id)
+    return Ok(response);
+}
+
+[HttpGet("{id}")]
+public async Task<IActionResult> GetById(long id)
+{
+    var d = await _service.GetByIdAsync(id);
+
+    if (d == null)
+        return NotFound();
+
+    var response = new DonationResponseDto
     {
-        var donation = await _service.GetByIdAsync(id);
+        Id = d.Id,
+        Amount = d.Amount,
+        Date = d.Date,
+        Status = d.Status.ToString(),
+        UserId = d.UserId,
+        UserName = d.User != null ? d.User.Name : "",
+        CampaignId = d.CampaignId,
+        CampaignTitle = d.Campaign != null ? d.Campaign.Title : ""
+    };
 
-        return donation == null ? NotFound() : Ok(donation);
-    }
+    return Ok(response);
+}
 
-    [HttpGet("campaign/{campaignId}")]
-    [EnableRateLimiting("PublicPolicy")]
-    public async Task<IActionResult> GetByCampaign(long campaignId)
+[HttpGet("campaign/{campaignId}")]
+[EnableRateLimiting("PublicPolicy")]
+public async Task<IActionResult> GetByCampaign(long campaignId)
+{
+    var donations = await _service.GetByCampaignAsync(campaignId);
+
+    var response = donations.Select(d => new DonationResponseDto
     {
-        return Ok(await _service.GetByCampaignAsync(campaignId));
-    }
+        Id = d.Id,
+        Amount = d.Amount,
+        Date = d.Date,
+        Status = d.Status.ToString(),
+        UserId = d.UserId,
+        UserName = d.User != null ? d.User.Name : "",
+        CampaignId = d.CampaignId,
+        CampaignTitle = d.Campaign != null ? d.Campaign.Title : ""
+    });
 
-    [HttpGet("user/{userId}")]
-    [EnableRateLimiting("PublicPolicy")]
-    public async Task<IActionResult> GetByUser(long userId)
+    return Ok(response);
+}
+
+[HttpGet("user/{userId}")]
+[EnableRateLimiting("PublicPolicy")]
+public async Task<IActionResult> GetByUser(long userId)
+{
+    var donations = await _service.GetByUserAsync(userId);
+
+    var response = donations.Select(d => new DonationResponseDto
     {
-        return Ok(await _service.GetByUserAsync(userId));
-    }
+        Id = d.Id,
+        Amount = d.Amount,
+        Date = d.Date,
+        Status = d.Status.ToString(),
+        UserId = d.UserId,
+        UserName = d.User != null ? d.User.Name : "",
+        CampaignId = d.CampaignId,
+        CampaignTitle = d.Campaign != null ? d.Campaign.Title : ""
+    });
 
+    return Ok(response);
+}
     [HttpPost]
     public async Task<IActionResult> Create(CreateDonationDto dto)
     {

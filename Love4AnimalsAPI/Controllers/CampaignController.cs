@@ -17,21 +17,50 @@ public class CampaignController : ControllerBase
         _service = service;
     }
 
-    [HttpGet]
-    [EnableRateLimiting("PublicPolicy")]
-    public async Task<IActionResult> GetAll()
-    {
-        return Ok(await _service.GetAllAsync());
-    }
+   [HttpGet]
+[EnableRateLimiting("PublicPolicy")]
+public async Task<IActionResult> GetAll()
+{
+    var campaigns = await _service.GetAllAsync();
 
-    [HttpGet("{id}")]
-    [EnableRateLimiting("PublicPolicy")]
-    public async Task<IActionResult> GetById(long id)
+    var response = campaigns.Select(c => new CampaignResponseDto
     {
-        var campaign = await _service.GetByIdAsync(id);
+        Id = c.Id,
+        Title = c.Title,
+        GoalAmount = c.GoalAmount,
+        CurrentAmount = c.CurrentAmount,
+        Status = c.Status.ToString(),
+        Description = c.Description,
+        TotalPosts = c.Posts != null ? c.Posts.Count : 0,
+        TotalDonations = c.Donations != null ? c.Donations.Count : 0
+    });
 
-        return campaign == null ? NotFound() : Ok(campaign);
-    }
+    return Ok(response);
+}
+
+[HttpGet("{id}")]
+[EnableRateLimiting("PublicPolicy")]
+public async Task<IActionResult> GetById(long id)
+{
+    var c = await _service.GetByIdAsync(id);
+
+    if (c == null)
+        return NotFound();
+
+    var response = new CampaignResponseDto
+    {
+        Id = c.Id,
+        Title = c.Title,
+        GoalAmount = c.GoalAmount,
+        CurrentAmount = c.CurrentAmount,
+        Status = c.Status.ToString(),
+        Description = c.Description,
+        TotalPosts = c.Posts != null ? c.Posts.Count : 0,
+        TotalDonations = c.Donations != null ? c.Donations.Count : 0
+    };
+
+    return Ok(response);
+}
 
     [HttpPost]
     public async Task<IActionResult> Create(CreateCampaignDto dto)

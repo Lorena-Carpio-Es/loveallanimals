@@ -22,28 +22,47 @@ public class CommentController : ControllerBase
 
    
     [HttpGet]
-    public async Task<IActionResult> GetByPost(long postId)
+public async Task<IActionResult> GetByPost(long postId)
+{
+    var comments = await _service.GetByPostAsync(postId);
+
+    var response = comments.Select(c => new CommentResponseDto
     {
-        return Ok(await _service.GetByPostAsync(postId));
-    }
+        Id = c.Id,
+        Text = c.Text,
+        Date = c.Date,
+        PostId = c.PostId
+    });
 
-    
-    [HttpPost]
-    public async Task<IActionResult> Create(long postId, CreateCommentDto dto)
+    return Ok(response);
+}
+
+[HttpPost]
+public async Task<IActionResult> Create(long postId, CreateCommentDto dto)
+{
+    var post = await _postService.GetByIdAsync(postId);
+
+    if (post == null)
+        return BadRequest("El post no existe");
+
+    var comment = new Comment
     {
-      
-        var post = await _postService.GetByIdAsync(postId);
-        if (post == null)
-            return BadRequest("El post no existe ❌");
+        Text = dto.Text,
+        PostId = postId
+    };
 
-        var comment = new Comment
-        {
-            Text = dto.Text,
-            PostId = postId
-        };
+    var created = await _service.CreateAsync(comment);
 
-        return Ok(await _service.CreateAsync(comment));
-    }
+    var response = new CommentResponseDto
+    {
+        Id = created.Id,
+        Text = created.Text,
+        Date = created.Date,
+        PostId = created.PostId
+    };
+
+    return Ok(response);
+}
 
    
     [HttpPut("{id}")]

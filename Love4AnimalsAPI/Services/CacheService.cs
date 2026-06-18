@@ -23,28 +23,49 @@ public class CacheService : ICacheService
 
     public async Task<T?> GetAsync<T>(string key)
     {
-        var json = await _cache.GetStringAsync(key);
+        try
+        {
+            var json = await _cache.GetStringAsync(key);
 
-        if (string.IsNullOrEmpty(json))
+            if (string.IsNullOrEmpty(json))
+                return default;
+
+            return JsonSerializer.Deserialize<T>(json, _jsonOptions);
+        }
+        catch
+        {
             return default;
-
-        return JsonSerializer.Deserialize<T>(json, _jsonOptions);
+        }
     }
 
     public async Task SetAsync<T>(string key, T value, int minutes = 5)
     {
-        var json = JsonSerializer.Serialize(value, _jsonOptions);
-
-        var options = new DistributedCacheEntryOptions
+        try
         {
-            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(minutes)
-        };
+            var json = JsonSerializer.Serialize(value, _jsonOptions);
 
-        await _cache.SetStringAsync(key, json, options);
+            var options = new DistributedCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(minutes)
+            };
+
+            await _cache.SetStringAsync(key, json, options);
+        }
+        catch
+        {
+            
+        }
     }
 
     public async Task RemoveAsync(string key)
     {
-        await _cache.RemoveAsync(key);
+        try
+        {
+            await _cache.RemoveAsync(key);
+        }
+        catch
+        {
+            
+        }
     }
 }
